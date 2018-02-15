@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="librerias/gdx-1.9.8.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://libgdx.badlogicgames.com/nightlies/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="librerias/gdx-backend-headless-1.9.8.jar"/>
+	<classpathentry kind="lib" path="librerias/gdx-backend-lwjgl-1.9.8.jar"/>
+	<classpathentry kind="lib" path="librerias/gdx-backend-robovm-1.9.8.jar"/>
+	<classpathentry kind="lib" path="librerias/gdx-box2d-1.9.8.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://libgdx.badlogicgames.com/nightlies/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="librerias/gdx-box2d-gwt-1.9.8-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://libgdx.badlogicgames.com/nightlies/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="librerias/gdx-box2d-platform-1.9.8-natives-desktop.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://libgdx.badlogicgames.com/nightlies/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="librerias/gdx-platform-1.9.8-natives-desktop.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://libgdx.badlogicgames.com/nightlies/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="librerias/gdx-tools-1.9.8.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://libgdx.badlogicgames.com/nightlies/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="librerias/jinput-2.0.5.jar"/>
+	<classpathentry kind="lib" path="librerias/jinput-platform-2.0.5-natives-linux.jar"/>
+	<classpathentry kind="lib" path="librerias/jinput-platform-2.0.5-natives-osx.jar"/>
+	<classpathentry kind="lib" path="librerias/jinput-platform-2.0.5-natives-windows.jar"/>
+	<classpathentry kind="lib" path="librerias/jlayer-1.0.1-gdx.jar"/>
+	<classpathentry kind="lib" path="librerias/jorbis-0.0.17.jar"/>
+	<classpathentry kind="lib" path="librerias/jutils-1.0.0.jar"/>
+	<classpathentry kind="lib" path="librerias/lwjgl_util-2.9.2.jar"/>
+	<classpathentry kind="lib" path="librerias/lwjgl-2.9.2.jar"/>
+	<classpathentry kind="lib" path="librerias/lwjgl-platform-2.9.2-natives-linux.jar"/>
+	<classpathentry kind="lib" path="librerias/lwjgl-platform-2.9.2-natives-osx.jar"/>
+	<classpathentry kind="lib" path="librerias/lwjgl-platform-2.9.2-natives-windows.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
