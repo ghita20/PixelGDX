@@ -12,6 +12,10 @@ import pantallas.MapaUno;
 // Cargar un mapa, crear las fisicas etc..
 public class GestionesMapaUno {
 	
+	// Límites del mapa
+	public static final float WIDTH = 31.4f;
+	public static final float HEIGHT = 31.4f;
+	
 	private TmxMapLoader maploader; // Carga el tileMap
 	private TiledMap map; // Mapa tileMap
 	private OrthogonalTiledMapRenderer renderer; // Para renderizar
@@ -51,6 +55,11 @@ public class GestionesMapaUno {
 	public void render() {
 		// Dibuja
 		renderer.render();
+	}
+	
+	// Getters
+	public TiledMap getMap() {
+		return map;
 	}
 	
 

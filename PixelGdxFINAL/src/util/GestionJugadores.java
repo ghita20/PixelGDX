@@ -2,19 +2,27 @@ package util;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import hud.StatsJugador;
 import pantallas.MapaUno;
 import sprites.Jugador;
 
+// TODO: esta clase tiene que predecir si soy el servidor o el cliente
 public class GestionJugadores {
 	
 	// ATRIBUTOS 
 	private Jugador jugadorServidor; // Jugador servidor
 	private Jugador jugadorCliente; // Jugador cliente
 	
-	// CONSTRUCTOR
+	// HUD - pertenece al jugador principal
+	private StatsJugador statsJugador; // Los stats del jugador que se muestran en pantalla
+	
+	// CONSTRUCTOR 
 	public GestionJugadores ( MapaUno mapa ) {
 		// Jugador servidor
-		jugadorServidor = new Jugador(mapa, "rey", 69);
+		jugadorServidor = new Jugador(mapa, "rey");
+		
+		// Stats del jugador
+		statsJugador = new StatsJugador(mapa.getJuego().getBatch(), jugadorServidor);
 	}
 	
 	public void update( float delta ) {
@@ -25,6 +33,13 @@ public class GestionJugadores {
 	public void render( SpriteBatch batch ) {
 		// Jugador servidor
 		jugadorServidor.draw(batch);
+		
+		// Si no paramos el batch antes de renderizar el stage genera excepción
+		batch.end();
+		
+		// Renderiza los stats
+		statsJugador.stage.draw();
+		
 	}
 	
 	// Getters

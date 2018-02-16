@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -13,7 +14,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import juego.PixelGdx;
 import util.Colisiones;
 import util.GestionJugadores;
+import util.GestionMobs;
 import util.GestionesMapaUno;
+import util.WorldUpdate;
 
 public class MapaUno implements Screen {
 	
@@ -27,9 +30,11 @@ public class MapaUno implements Screen {
 	// Gestiones
 	private GestionesMapaUno mapa;		// Mapa
 	private GestionJugadores jugadores;	// Jugadores
+	private GestionMobs mobs;			// Mobs
 	
 	// Mundo
 	private World world; 				// Esta clase gestiona las físicas
+	private WorldUpdate worldUpdate;	// Gestiona el update del world y la eliminación de cuerpos
 	private Box2DDebugRenderer debugRender; // Imprime los límites de cada objeto que hay en el world
 	private final float GRAVEDAD = -5; 	// Gravedad
 	
@@ -59,28 +64,57 @@ public class MapaUno implements Screen {
         // Gestion jugadores
         jugadores = new GestionJugadores(this);
         
+        // Gestion mobs
+        mobs = new GestionMobs(this,mapa.getMap());
+        
         // Debug Render
         debugRender = new Box2DDebugRenderer();
+        
+        // World Update
+        worldUpdate = new WorldUpdate(world);
 	}
 	
-	
 	public void update( float delta ) {
-		// Actualiza el estado del mundo
-		world.step(1 / 60f, 6, 2);
-		
-		// Actualiza la camara
-		gameCam.position.x = jugadores.getJugadorPrincipal().getCuerpo().getPosition().x;
-		gameCam.position.y = jugadores.getJugadorPrincipal().getCuerpo().getPosition().y;
-		gameCam.update();
-		
-		// Actualiza el renderer del mapa
-		mapa.update(gameCam);
+		// Actualiza el estado del mundo y elimina los cuerpos que tiene pendientes de eliminar
+		worldUpdate.update();
 		
 		// Actualizo los jugadores
 		jugadores.update(delta);
 		
+		// Actualiza los mobs
+		mobs.update(delta);
+		
+		// Actualiza la camara para que siga al jugador
+		updateCam(delta,jugadores.getJugadorPrincipal().getCuerpo().getPosition().x,jugadores.getJugadorPrincipal().getCuerpo().getPosition().y);
+
+		// Actualiza el renderer del mapa
+		mapa.update(gameCam);
 	}
 	
+	// Actualiza el estado de la cámara
+	private void updateCam(float delta , float x , float y) {
+		// Límites y de la cámara
+		if (y >= GestionesMapaUno.HEIGHT - gameCam.viewportHeight / 2 )
+			y = GestionesMapaUno.HEIGHT - gameCam.viewportHeight / 2;
+		if (y < gameCam.viewportHeight / 2)
+			y = gameCam.viewportHeight / 2;
+		
+		// Límites x de la cámara
+		if (x >= GestionesMapaUno.WIDTH - gameCam.viewportWidth / 2 )
+			x = GestionesMapaUno.WIDTH - gameCam.viewportWidth / 2;
+		// Lado izquierdo
+		if (x < gameCam.viewportWidth / 2)
+			x = gameCam.viewportWidth / 2;
+		
+		// A donde se dirige la cámara
+        Vector3 target = new Vector3(x,y,0); 
+        // Le da un toque suave al movimiento de la cámara al seguir al jugador
+		gameCam.position.lerp(target, 0.04f);
+		// Update
+		gameCam.update();
+		
+	}
+
 	@Override
 	public void render( float delta ) {
 		// Actualiza todo
@@ -103,11 +137,17 @@ public class MapaUno implements Screen {
         // Empieza el renderizado
         juego.getBatch().begin();
         
-			// Renderiza los jugadores
+	        
+	        // Renderiza los mobs
+	        mobs.render(juego.getBatch());
+	        
+
+			// Renderiza los jugadores ( Hay que dejar que lo último que se renderize sea el jugador porque el se encargará de cerrar el batch )
 	        jugadores.render( juego.getBatch() );
         
-		// Termina el renderizado
-        juego.getBatch().end();
+		// Termina el renderizado ( lo termina el jugador en su render porque  )
+        //juego.getBatch().end();
+        
 	}
 	
 	
@@ -127,6 +167,10 @@ public class MapaUno implements Screen {
 	
 	public World getWorld() {
 		return world;
+	}
+	
+	public WorldUpdate getWorldUpdate() {
+		return worldUpdate;
 	}
 	
 	

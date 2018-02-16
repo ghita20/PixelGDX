@@ -11,6 +11,21 @@ import sprites.Jugador;
 
 public class Colisiones implements ContactListener{
 
+	// CategoryBits - categorias de los distintos cuerpos del juego
+	public static final short CATEGORIA_JUGADOR = 0x0001;
+	public static final short CATEGORIA_ENEMIGO = 0x0002;
+	public static final short CATEGORIA_ESCENARIO = 0x0004;
+	public static final short CATEGORIA_PODERES = 0x0008;
+	public static final short CATEGORIA_LIMITE = 0x0016;
+	public static final short CATEGORIA_ESPADA = 0x0032;
+
+	// Masks - cada máscara indica con qué tipo de categorias colisiona
+	public static final short MASK_JUGADOR = CATEGORIA_ENEMIGO | CATEGORIA_ESCENARIO;
+	public static final short MASK_ENEMIGO = CATEGORIA_JUGADOR | CATEGORIA_ESCENARIO | CATEGORIA_PODERES ;
+	public static final short MASK_PODERES = CATEGORIA_ENEMIGO;
+	public static final short MASK_LIMITES = CATEGORIA_ENEMIGO;
+	public static final short MASK_ESCENEARIO = -1; // colisiona con todo
+
 	@Override
 	public void beginContact(Contact contact) {
 		// Recogemos los Fixture de los dos objetos que han entrado en contacto
@@ -21,7 +36,7 @@ public class Colisiones implements ContactListener{
 		int cDef = fixtureA.getFilterData().categoryBits | fixtureB.getFilterData().categoryBits;
 		switch ( cDef ) {
 		// Choque entre jugador y escenario
-		case PixelGdx.CATEGORIA_JUGADOR | PixelGdx.CATEGORIA_ESCENARIO :
+		case CATEGORIA_JUGADOR | CATEGORIA_ESCENARIO :
 			Jugador jugador = null;
 			
 			if ( fixtureA.getUserData() instanceof Jugador ) 

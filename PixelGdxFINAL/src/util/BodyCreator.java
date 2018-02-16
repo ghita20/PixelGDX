@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ChainShape;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
@@ -52,9 +53,9 @@ public final class BodyCreator {
             fdef.shape = shape;
             
             // Categoria
-            fdef.filter.categoryBits = PixelGdx.CATEGORIA_ESCENARIO;
+            fdef.filter.categoryBits = Colisiones.CATEGORIA_ESCENARIO;
             // Máscara para las colisiones
-            fdef.filter.maskBits = PixelGdx.MASK_ESCENEARIO;
+            fdef.filter.maskBits = Colisiones.MASK_ESCENEARIO;
             
             // Le da forma al objeto
             body.createFixture(fdef);
@@ -88,9 +89,9 @@ public final class BodyCreator {
         	fdef.shape = shapePoly;
         	
         	// Categoria
-            fdef.filter.categoryBits = PixelGdx.CATEGORIA_ESCENARIO;
+            fdef.filter.categoryBits = Colisiones.CATEGORIA_ESCENARIO;
             // Máscara para las colisiones
-            fdef.filter.maskBits = PixelGdx.MASK_ESCENEARIO;
+            fdef.filter.maskBits = Colisiones.MASK_ESCENEARIO;
         	
             // Da forma al objeto
         	bdy.createFixture(fdef);
@@ -116,7 +117,7 @@ public final class BodyCreator {
 
 		// Fixture
 		FixtureDef fdef = new FixtureDef();
-		fdef.friction = 0.05f; // Hace parar un poco el impulso
+		fdef.friction = 0.09f; // Hace parar un poco el impulso
 		
 		// Forma del cuerpo
 		PolygonShape shape = new PolygonShape();
@@ -125,9 +126,9 @@ public final class BodyCreator {
 		
 		fdef.shape = shape;
 		// Categoria Jugador
-		fdef.filter.categoryBits = PixelGdx.CATEGORIA_JUGADOR;
+		fdef.filter.categoryBits = Colisiones.CATEGORIA_JUGADOR;
 		// Máscara para las colisiones
-		fdef.filter.maskBits = PixelGdx.MASK_JUGADOR;
+		fdef.filter.maskBits = Colisiones.MASK_JUGADOR;
 		// Crea el cuerpo
 		body.createFixture(fdef).setUserData(sprite);
 		
@@ -135,4 +136,72 @@ public final class BodyCreator {
 		return body;
 	}
 
+	// Crea la onda que genera la espada al atacar en la posición del jugador
+	public static Body crearCuerpoOnda ( World world, Sprite sprite , float x , float y) {
+		// Definición del cuerpo
+		BodyDef bdef = new BodyDef();
+		// Posición inicial
+		bdef.position.set(x , y );
+		// Tipo dinámico
+		bdef.type = BodyDef.BodyType.DynamicBody;
+		
+		// Crea el cuerpo
+		Body cuerpo = world.createBody(bdef);
+		
+		// Fixture
+		FixtureDef fdef = new FixtureDef();
+		fdef.friction = 1;
+		fdef.density = 10;
+		
+		// Forma del objeto
+		PolygonShape shape = new PolygonShape();
+		
+		// Tamaño
+		shape.setAsBox(8 / PixelGdx.PPM, 10  / PixelGdx.PPM);
+		
+		// Filtro y máscara
+		fdef.shape = shape;
+		fdef.filter.categoryBits = Colisiones.CATEGORIA_PODERES;
+		fdef.filter.maskBits = Colisiones.MASK_PODERES;
+		
+		// Crea el objeto
+		cuerpo.createFixture(fdef).setUserData(sprite);
+		
+		// Devuelve el cuerpo
+		return cuerpo;
+	}
+
+	// Crea un cuerpo para los enemigos
+	public static Body crearCuerpoEnemigo ( World world , Sprite sprite , float x , float y , float width , float heigh ) {
+		// Definición del cuerpo
+		BodyDef bdef = new BodyDef();
+		// Posición de inicio
+		bdef.position.set(x , y );
+		// Tipo dinámico
+		bdef.type = BodyDef.BodyType.DynamicBody;
+		
+		// Crea el cuerpo
+		Body cuerpo = world.createBody(bdef);
+		
+		// Filtro para las colisiones..etc
+		FixtureDef fdef = new FixtureDef();
+		fdef.friction = 0.3f; // Hace parar un poco el impulso
+		fdef.filter.groupIndex = -1; // Never collide
+		
+		// Forma
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(width / PixelGdx.PPM, heigh  / PixelGdx.PPM);
+		
+		fdef.shape = shape;
+		fdef.filter.categoryBits = Colisiones.CATEGORIA_ENEMIGO;
+		fdef.filter.maskBits = Colisiones.MASK_ENEMIGO;
+		
+		// Fixture
+		cuerpo.createFixture(fdef).setUserData(sprite);
+		
+		// Devuelve el cuerpo
+		return cuerpo;
+		
+	}
+	
 }
