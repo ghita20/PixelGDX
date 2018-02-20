@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -94,11 +95,65 @@ public class StatsJugador {
 		
 		// Añade la tabla al stage
 		stage.addActor(table);
+
+		
+	}
+	
+	// Refresca los corazones que se tienen que imprimir en pantall
+	public void refrescarStats ( ) {
+		
+		// Puntos del vida del jugador
+		int numVidas = jugador.getPuntosDeVida();
+		int vidasCorazones = 0;
+		
+		// Calcula cuantos puntos de vida tenemos almacenados en los corazones
+		for ( int i = corazones.size()-1; i>=0 ; i-- ) 
+			vidasCorazones += corazones.get(i).getVida();
+		
+		// Si el numVidas es = al numero de puntos de vida que tenemos en los corazones sale del método
+		if ( numVidas == vidasCorazones ) 
+			return;
+		
+		// Resta las vidas necesarias para sincronizar los corazones con los puntos de vida del jugador
+		if ( numVidas < vidasCorazones ) {
+			int iCorazon = NUMERO_CORAZONES -1; // Indice corazones
+			for ( int i = vidasCorazones ; i > numVidas ; i-- ) {
+				while ( iCorazon > 0 && corazones.get(iCorazon).getVida() == 0)
+					--iCorazon;
+					
+				// Resta el punto de vida
+				corazones.get(iCorazon).restarPunto();
+				// Cambia la imagen
+				vidas.get( iCorazon ).setActor( corazones.get(iCorazon).getCorazon());
+				
+			}
+		}
 	}
 	
 	// Dispose
 	public void dispose ( ) {
 		stage.dispose();
+	}
+	
+	// Muestra el dialogo del npc en pantalla
+	public void mostrarDialogoNpc ( ) {
+		// Para que se puedan pulsar los botones
+		Gdx.input.setInputProcessor( stage );
+		
+		// Dialogo
+		new Dialog ( "confirm exit",skin) {
+			{
+				text("Si me das tu espada la mejoraré, pero tardaré un un tiempo...");
+				button("Vale","hasta luego");
+				button("No quieroo","pos quedate");
+			}
+			
+			@Override
+			protected void result(Object object) {
+				
+			}
+			
+		}.show(stage);
 	}
 
 }

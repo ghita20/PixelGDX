@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import pantallas.Inicio;
-import pantallas.MapaUno;
 
 public class PixelGdx extends Game {
 	
@@ -33,7 +32,7 @@ public class PixelGdx extends Game {
 		shapeRenderer = new ShapeRenderer();
 
 		// Carga el atlas con los sprites
-		atlasSprites = new TextureAtlas("assets/atlas/mobs.atlas");
+		atlasSprites = new TextureAtlas(Gdx.files.internal("assets/atlas/mobs.atlas")); 
 		
 		// Carga el Mapa1
 		//setScreen( new MapaUno(this) );

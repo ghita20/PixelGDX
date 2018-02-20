@@ -27,7 +27,7 @@ public class WorldUpdate {
 		eliminarCuerpos();
 	}
 	
-	// Añade un cuerpo a la lista
+	// Añade un cuerpo a la lista de cuerpos a eliminar
 	public void addCuerpo ( Body body ) {
 		cuerposEliminar.add(body);
 	}

@@ -14,7 +14,6 @@ import util.BodyCreator;
 public abstract class Enemigo extends Sprite {
 	
 	// Atributos estáticos
-	private static final int MAX_VIDA = 100;
 	private static final float VELOCIDAD = 0.4f;
 	
 	// Mapa
@@ -25,16 +24,20 @@ public abstract class Enemigo extends Sprite {
 
 	// Atributos
 	protected int puntosDeVida;
+	protected boolean muerto;
+	protected int daño; // Daño que hace el enemigo al atacar
 	
 	// Animaciones
 	protected Animation animacionMovimiento;
+	protected Animation animacionAturdido;
+	protected boolean aturdido;
 	protected float tiempo; // Tiempo de la animación
 	
 	// Dirección en la que se dirige
 	protected boolean direccionDerecha;
 	
 	// Constructor
-	public Enemigo ( MapaUno mapa, float x , float y , float width , float height , float spriteWidth , float spriteHeight ) {
+	public Enemigo ( MapaUno mapa, float x , float y , float width , float height , float spriteWidth , float spriteHeight , int vida , int daño ) {
 		// Mapa
 		this.mapa = mapa;
 		// Cuerpo del enemigo
@@ -52,12 +55,21 @@ public abstract class Enemigo extends Sprite {
 		// Variables
 		tiempo = 0;
 		direccionDerecha = true;
+		muerto = false;
+		puntosDeVida = vida;
+		this.daño = daño;
 	}
 	
 	// Update
 	public void update ( float delta ) {
-		// Mueve el enemigo
-		mover();
+		// Mueve el enemigo si no está muerto
+		if ( !muerto )
+			mover();
+		
+		// Comprueba si se ha acabado el estado de aturdimiento
+		if ( aturdido )
+			if ( animacionAturdido.isAnimationFinished(tiempo) )
+				aturdido = false;
 		
 		// Posiciona el sprite
 		setPosition( cuerpo.getPosition().x - getWidth() / 2, cuerpo.getPosition().y - getHeight() / 2);
@@ -81,7 +93,11 @@ public abstract class Enemigo extends Sprite {
 	
 	// Get Frame
 	public TextureRegion getFrame ( float delta ) {
+		// Aumenta el tiempo de la animación
 		tiempo += delta;
+		// Si está aturdido devuelve el frame de aturdimiento
+		if ( aturdido )
+			return (TextureRegion)animacionAturdido.getKeyFrame(tiempo);
 		// Por defecto devuelve la animación de movimiento
 		return (TextureRegion) animacionMovimiento.getKeyFrame(tiempo, true);
 	}
@@ -89,14 +105,52 @@ public abstract class Enemigo extends Sprite {
 	// Movimiento por defecto del enemigo ( se moverá entre los límites puestos en el tileMap )
 	protected void mover() { 
 		// Impulsará al enemigo según su posición
-		if ( (cuerpo.getLinearVelocity().x < 0.5f && direccionDerecha) || (cuerpo.getLinearVelocity().x > -0.5f && !direccionDerecha) )
-			cuerpo.applyLinearImpulse(new Vector2( direccionDerecha?0.1f:-0.1f , 0 ), cuerpo.getWorldCenter(), true);
+		cuerpo.applyLinearImpulse(new Vector2( direccionDerecha?0.1f: -0.1f,0 ), cuerpo.getWorldCenter(), true);
 	}
 	
+	// Cambia el movimiento del enemigo
+	public void cambiarDireccion ( boolean enDireccionDerecha ) {
+		direccionDerecha = enDireccionDerecha;
+		cuerpo.applyLinearImpulse(new Vector2( direccionDerecha?3.3f: -3.3f,0 ), cuerpo.getWorldCenter(), true);
+	}
+	
+	// Ataca a un jugador
+	public void atacarJugador ( Jugador jugador ) {
+		// Asigna la velocidad lineal del jugador a 0
+		jugador.getCuerpo().setLinearVelocity( new Vector2(0,0));
+		// Ataca impulsandolo
+		jugador.getCuerpo().applyLinearImpulse(new Vector2( direccionDerecha?1f:-1f,1.5f), jugador.getCuerpo().getWorldCenter(), true);
+		// Aturde al jugador
+		jugador.aturdir();
+		
+		// Resta vida al jugador
+		jugador.restarVida(daño);
+	}
+	
+	// Restar vida
+	public void restarVida ( int daño ) {
+		if ( !muerto ) {
+			puntosDeVida -= daño;
+			// Al atacar aturde al enemigo para mostrar el frame con el enemigo aturdido
+			aturdido = true;
+			tiempo = 0;
+		}
+		if ( puntosDeVida <= 0 )
+			muerto = true;
+	}
 	
 	// Métodos abstractos
 	protected abstract void cargarAnimacionMovimiento();
 	
-	
+	// Getters
+	public Body getCuerpo() {
+		return cuerpo;
+	}
+	public int getPuntosDeVida() {
+		return puntosDeVida;
+	}
+	public boolean getMuerto ( ) {
+		return muerto;
+	}
 
 }

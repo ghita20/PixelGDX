@@ -28,6 +28,9 @@ public class GestionJugadores {
 	public void update( float delta ) {
 		// Jugador servidor
 		jugadorServidor.update( delta );
+		
+		// Refresca los stats 
+		statsJugador.refrescarStats();
 	}
 	
 	public void render( SpriteBatch batch ) {
@@ -46,6 +49,9 @@ public class GestionJugadores {
 	// Este método tiene que devolver el jugador cliente si somos cliente o el servidor si somos servidor...
 	public Jugador getJugadorPrincipal() {
 		return jugadorServidor;
+	}
+	public StatsJugador getStatsJugador() {
+		return statsJugador;
 	}
 	
 

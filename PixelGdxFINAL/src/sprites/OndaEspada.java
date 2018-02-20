@@ -27,7 +27,7 @@ public class OndaEspada extends Sprite {
 	private Animation animacion;
 	
 	// Constructor
-	public OndaEspada ( Jugador jugador ) {
+	public OndaEspada ( Jugador jugador , int spriteWidth , int spriteheight , int widthCuerpo , int heightCuerpo) {
 		// Region del atlas correspondiente a la onda
 		super(jugador.getMapa().getJuego().getAtlas().findRegion("onda"));
 		this.jugador = jugador;
@@ -36,7 +36,7 @@ public class OndaEspada extends Sprite {
 		cargarAnimacion();
 		
 		// Tamaño
-		setBounds(0, 0, 32 / PixelGdx.PPM, 32 / PixelGdx.PPM);
+		setBounds(0, 0, spriteWidth / PixelGdx.PPM, spriteheight / PixelGdx.PPM);
 		// Frame actual
 		setRegion( (TextureRegion)animacion.getKeyFrame(0f) );
 		
@@ -44,7 +44,7 @@ public class OndaEspada extends Sprite {
 		cuerpo = BodyCreator.crearCuerpoOnda(jugador.getMapa().getWorld(), 
 				this, 
 				jugador.getCuerpo().getPosition().x  + (jugador.enDireccionDerecha()?-0.1f:0.1f), 
-				jugador.getCuerpo().getPosition().y );
+				jugador.getCuerpo().getPosition().y , widthCuerpo, heightCuerpo);
 		
 		// La onda se dirigirá en la dirección en la que está mirando el jugador al atacar
 		direccionDerecha = jugador.enDireccionDerecha();
@@ -106,5 +106,8 @@ public class OndaEspada extends Sprite {
 	// Getters
 	public Body getCuerpo() {
 		return cuerpo;
+	}
+	public Jugador getJugador ( ) {
+		return jugador;
 	}
 }

@@ -1,16 +1,22 @@
 package util;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 import juego.PixelGdx;
 import pantallas.MapaUno;
 import sprites.Enemigo;
+import sprites.Loot;
+import sprites.Moneda;
+import sprites.Murcielago;
 import sprites.Serpiente;
 
 // Esta clase se encarga de la gestión de los mobs, loot 
@@ -39,9 +45,30 @@ public class GestionMobs {
 	
 	// Update
 	public void update( float delta ) {
-		// Actualiza el estado de los enemigos
-		for ( Enemigo enemigo : enemigos )
-			enemigo.update(delta);
+		// Itera sobre los enemigos
+		Iterator<Enemigo> iterador = enemigos.iterator();
+		// Recorre los enemigos
+		while ( iterador.hasNext() ) {
+			Enemigo enemigo = iterador.next();
+			// Si el enemigo no está muerto actuliza su estado
+			if ( !enemigo.getMuerto() )
+				enemigo.update(delta);
+			else { // Si está muerto lo añade a li lista de cuerpos a eliminar
+				mapa.getWorldUpdate().addCuerpo(enemigo.getCuerpo());
+				
+				// Genera el loot aleatoriamente
+				int random = (int) (Math.random()*10);
+				System.out.println(random);
+				if ( random > 5) {
+					Loot auxLoot = new Moneda(mapa,enemigo.getCuerpo().getPosition().x,enemigo.getCuerpo().getPosition().y,BodyType.StaticBody);
+					// Lo añade al mundo
+					mapa.getLoot().addLoot(auxLoot); 
+				}
+				
+				// y lo elimina del arraylist
+				iterador.remove();
+			}
+		}
 	}
 	
 	// Render
@@ -54,12 +81,14 @@ public class GestionMobs {
 	// Crea los mobs que hay en el tileMap
 	private void generarMobs ( TiledMap map ) {
 		// Genera las serpientes
-		for(MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)){
-			// Recupera el rectángulo para saber su posición
-			Rectangle rect = ((RectangleMapObject) object).getRectangle();
-			// Crea una nueva serpiente
-			enemigos.add( new Serpiente(mapa, rect.getX() / PixelGdx.PPM, rect.getY() / PixelGdx.PPM));
-		}
+		ArrayList<Serpiente> serpientes = BodyCreator.spawnSerpientes(mapa, map);
+		// Los añade a la lista
+		enemigos.addAll(serpientes);
+		
+		// Genera los murcielagos
+		ArrayList<Murcielago> murcielagos = BodyCreator.spawnMurcielagos(mapa, map);
+		// Los añade a la lista de enemigos
+		enemigos.addAll(murcielagos);
 	}
 	
 

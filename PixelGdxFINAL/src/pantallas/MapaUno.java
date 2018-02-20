@@ -1,19 +1,28 @@
 package pantallas;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import juego.PixelGdx;
+import sprites.Murcielago;
+import util.BodyCreator;
 import util.Colisiones;
+import util.GestionAudio;
 import util.GestionJugadores;
+import util.GestionLoot;
 import util.GestionMobs;
 import util.GestionesMapaUno;
 import util.WorldUpdate;
@@ -31,6 +40,7 @@ public class MapaUno implements Screen {
 	private GestionesMapaUno mapa;		// Mapa
 	private GestionJugadores jugadores;	// Jugadores
 	private GestionMobs mobs;			// Mobs
+	private GestionLoot loot;			// Loot
 	
 	// Mundo
 	private World world; 				// Esta clase gestiona las físicas
@@ -40,6 +50,9 @@ public class MapaUno implements Screen {
 	
 	// Constructor
 	public MapaUno ( PixelGdx juego ) {
+		// Musica de fondo
+		GestionAudio.MUSICA_FONDO.play();
+		
 		// Juego
 		this.juego = juego;
 
@@ -66,14 +79,19 @@ public class MapaUno implements Screen {
         
         // Gestion mobs
         mobs = new GestionMobs(this,mapa.getMap());
+
+        // World Update
+        worldUpdate = new WorldUpdate(world);
+        
+        // Gestion loot
+        loot = new GestionLoot(this);
         
         // Debug Render
         debugRender = new Box2DDebugRenderer();
         
-        // World Update
-        worldUpdate = new WorldUpdate(world);
 	}
 	
+	// Update
 	public void update( float delta ) {
 		// Actualiza el estado del mundo y elimina los cuerpos que tiene pendientes de eliminar
 		worldUpdate.update();
@@ -84,11 +102,15 @@ public class MapaUno implements Screen {
 		// Actualiza los mobs
 		mobs.update(delta);
 		
+		// Actualiza el loot
+		loot.update(delta);
+		
 		// Actualiza la camara para que siga al jugador
 		updateCam(delta,jugadores.getJugadorPrincipal().getCuerpo().getPosition().x,jugadores.getJugadorPrincipal().getCuerpo().getPosition().y);
 
 		// Actualiza el renderer del mapa
 		mapa.update(gameCam);
+		
 	}
 	
 	// Actualiza el estado de la cámara
@@ -141,6 +163,9 @@ public class MapaUno implements Screen {
 	        // Renderiza los mobs
 	        mobs.render(juego.getBatch());
 	        
+	        // Renderiza el loot
+	        loot.render(juego.getBatch());
+	        
 
 			// Renderiza los jugadores ( Hay que dejar que lo último que se renderize sea el jugador porque el se encargará de cerrar el batch )
 	        jugadores.render( juego.getBatch() );
@@ -172,7 +197,15 @@ public class MapaUno implements Screen {
 	public WorldUpdate getWorldUpdate() {
 		return worldUpdate;
 	}
-	
+	public GestionJugadores getJugadores() {
+		return jugadores;
+	}
+	public GestionLoot getLoot() {
+		return loot;
+	}
+	public GestionesMapaUno getGestionesMapa() {
+		return mapa;
+	}
 	
 	
 	
