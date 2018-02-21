@@ -1,5 +1,6 @@
 package sprites;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -14,8 +15,8 @@ public class Moneda extends Loot {
 	private static final float SPRITE_HEIGHT = 16;
 	
 	// Constructor
-	public Moneda(MapaUno mapa, float x, float y, BodyType tipo) {
-		super(mapa, x, y, SPRITE_WIDTH, SPRITE_HEIGHT, tipo);
+	public Moneda(MapaUno mapa, float x, float y, BodyType tipo, boolean sensor) {
+		super(mapa, x, y, SPRITE_WIDTH, SPRITE_HEIGHT, tipo, sensor);
 	}
 
 	@Override
@@ -23,7 +24,7 @@ public class Moneda extends Loot {
 		Array<TextureRegion> frames = new Array<TextureRegion>();
 		// Caraga la animación directamente del atlas
 		for (int i = 1; i < 9; i++) 
-			frames.add( new TextureRegion( new Texture("assets/moneda/" +i +".png") , 1 , 1, 45 ,48));
+			frames.add( new TextureRegion( new Texture(Gdx.files.internal("assets/moneda/" +i +".png")) , 1 , 1, 45 ,48));
 		animacion = new Animation(0.15f, frames);
 	}
 	

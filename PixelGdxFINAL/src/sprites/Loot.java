@@ -11,8 +11,13 @@ import pantallas.MapaUno;
 import util.BodyCreator;
 
 public abstract class Loot extends Sprite{
+	
+	// MAX_ID
+	private static int MAX_ID = 0;
+	
 	// Cuerpo
 	private Body cuerpo;
+	private int id;
 	
 	// Animacion
 	protected Animation animacion;
@@ -22,9 +27,9 @@ public abstract class Loot extends Sprite{
 	private boolean cogido;
 	
 	// Constructor
-	public Loot ( MapaUno mapa , float x , float y , float spriteWidth , float spriteHeight, BodyType tipo) {
+	public Loot ( MapaUno mapa , float x , float y , float spriteWidth , float spriteHeight, BodyType tipo , boolean sensor) {
 		// Cuerpo 
-		cuerpo = BodyCreator.crearCuerpoLoot(mapa.getWorld(), this, x, y, 8, 8, tipo);
+		cuerpo = BodyCreator.crearCuerpoLoot(mapa.getWorld(), this, x, y, 8, 8, tipo, sensor);
 		// Carga la animación
 		cargarAnimacion();
 		// Tiempo animación
@@ -35,6 +40,7 @@ public abstract class Loot extends Sprite{
 		setRegion( (TextureRegion)animacion.getKeyFrame(0f)  );
 		// por defecto no estña cogido
 		cogido = false;
+		id = MAX_ID++;
 	}
 
 	// Update
@@ -53,6 +59,10 @@ public abstract class Loot extends Sprite{
 		// Devuelve el keyframe
 		return (TextureRegion) animacion.getKeyFrame(tiempo, true); // En bucle
 	}
+	public TextureRegion getFrameRemoto ( float tiempoAnimacion ) {
+		// Devuelve el keyframe
+		return (TextureRegion) animacion.getKeyFrame(tiempoAnimacion, true); // En bucle
+	}
 		
 	// Método abstractos
 	protected abstract void cargarAnimacion();
@@ -67,5 +77,11 @@ public abstract class Loot extends Sprite{
 	}
 	public Body getCuerpo() {
 		return cuerpo;
+	}
+	public int getId() {
+		return id;
+	}
+	public float getTiempo() {
+		return tiempo;
 	}
 }

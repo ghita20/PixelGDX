@@ -6,9 +6,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 
 import juego.PixelGdx;
+import otros.Espada.TiposEspada;
 import util.BodyCreator;
 
 public class OndaEspada extends Sprite {
@@ -27,13 +27,13 @@ public class OndaEspada extends Sprite {
 	private Animation animacion;
 	
 	// Constructor
-	public OndaEspada ( Jugador jugador , int spriteWidth , int spriteheight , int widthCuerpo , int heightCuerpo) {
+	public OndaEspada ( Jugador jugador , TiposEspada espada , int spriteWidth , int spriteheight , int widthCuerpo , int heightCuerpo) {
 		// Region del atlas correspondiente a la onda
 		super(jugador.getMapa().getJuego().getAtlas().findRegion("onda"));
 		this.jugador = jugador;
 		
 		// Animación
-		cargarAnimacion();
+		cargarAnimacion(espada==TiposEspada.TOCHA?0.15f:0.07f);
 		
 		// Tamaño
 		setBounds(0, 0, spriteWidth / PixelGdx.PPM, spriteheight / PixelGdx.PPM);
@@ -44,7 +44,7 @@ public class OndaEspada extends Sprite {
 		cuerpo = BodyCreator.crearCuerpoOnda(jugador.getMapa().getWorld(), 
 				this, 
 				jugador.getCuerpo().getPosition().x  + (jugador.enDireccionDerecha()?-0.1f:0.1f), 
-				jugador.getCuerpo().getPosition().y , widthCuerpo, heightCuerpo);
+				jugador.getCuerpo().getPosition().y  +(espada==TiposEspada.TOCHA?0.1f:0), widthCuerpo, heightCuerpo);
 		
 		// La onda se dirigirá en la dirección en la que está mirando el jugador al atacar
 		direccionDerecha = jugador.enDireccionDerecha();
@@ -80,22 +80,22 @@ public class OndaEspada extends Sprite {
 	}
 
 	// Carga la animación de la onda
-	private void cargarAnimacion ( ) {
+	private void cargarAnimacion ( float duracion ) {
 		// ArrayList
 		Array<TextureRegion> frames = new Array<TextureRegion>();
 		// Recoge los frames de la animación
 		for (int i = 0; i < 4; i++)
 			frames.add( new TextureRegion(getTexture(), i * 32 +1 , 103, 32 ,32));
 		// Instancia la animación
-		animacion = new Animation(0.15f, frames);
+		animacion = new Animation(duracion, frames);
 	}
 	
 	// Impulsa la onda en una dirección
 	private void impulsarOnda ( ) {
 		if ( direccionDerecha )
-			cuerpo.applyForceToCenter(new Vector2(40f, 0),true); // Derecha
+			cuerpo.applyForceToCenter(new Vector2(60f, 0),true); // Derecha
 		else
-			cuerpo.applyForceToCenter(new Vector2(-40f, 0),true); // Izquierda
+			cuerpo.applyForceToCenter(new Vector2(-60f, 0),true); // Izquierda
 	}
 
 	// Comrpueba si la animación ha terminado

@@ -244,8 +244,40 @@ public final class BodyCreator {
 		
 	}
 
+	// Crea un cuerpo jugador en el mundo
+	public static Body crearCuerpoNpc ( World world , Sprite sprite , float x , float y) {
+		// Definicion del cuerpo
+		BodyDef bdef = new BodyDef();
+		// Posicion por defecto
+		bdef.position.set(x, y);
+		// Tipo estático
+		bdef.type = BodyDef.BodyType.StaticBody;
+
+		// Crea el cuerpo
+		Body body = world.createBody(bdef);
+
+		// Fixture
+		FixtureDef fdef = new FixtureDef();
+
+		// Forma del cuerpo
+		PolygonShape shape = new PolygonShape();
+		// Tamaño
+		shape.setAsBox(8 / PixelGdx.PPM, 11  / PixelGdx.PPM);
+
+		fdef.shape = shape;
+		// Categoria
+		fdef.filter.categoryBits = Colisiones.CATEGORIA_NPC;
+		// Máscara para las colisiones
+		fdef.filter.maskBits = Colisiones.MASK_NPC;
+		// Crea el cuerpo
+		body.createFixture(fdef).setUserData(sprite);
+
+		// Devuelve el objeto Body
+		return body;
+	}
+
 	// PROVISIONAL
-	public static Body crearCuerpoLoot (World world , Sprite sprite , float x , float y , float width , float heigh , BodyDef.BodyType tipo ) {
+	public static Body crearCuerpoLoot (World world , Sprite sprite , float x , float y , float width , float heigh , BodyDef.BodyType tipo, boolean sensor ) {
 		// Definición del cuerpo
 		BodyDef bdef = new BodyDef();
 		// Posición de inicio
@@ -260,7 +292,7 @@ public final class BodyCreator {
 		FixtureDef fdef = new FixtureDef();
 		fdef.friction = 0.3f; // Hace parar un poco el impulso
 		fdef.filter.groupIndex = -1; // Never collide
-		fdef.isSensor = true;
+		fdef.isSensor = sensor;
 
 		// Forma
 		PolygonShape shape = new PolygonShape();
@@ -308,7 +340,7 @@ public final class BodyCreator {
 		// Recorre la capa del tileMap que contiene las posiciones
 		for(MapObject object : map.getLayers().get(9).getObjects().getByType(RectangleMapObject.class)){
 			Rectangle rect = ((RectangleMapObject) object).getRectangle();
-			auxLoot.add( new Moneda(mapa, rect.getX() / PixelGdx.PPM, rect.getY() / PixelGdx.PPM, BodyType.StaticBody));
+			auxLoot.add( new Moneda(mapa, rect.getX() / PixelGdx.PPM, rect.getY() / PixelGdx.PPM, BodyType.StaticBody,true));
 		}
 		// Devuelve las monedas
 		return auxLoot;

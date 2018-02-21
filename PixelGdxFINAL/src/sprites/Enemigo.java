@@ -15,6 +15,7 @@ public abstract class Enemigo extends Sprite {
 	
 	// Atributos estáticos
 	private static final float VELOCIDAD = 0.4f;
+	private static int MAX_ID = 0; // Id de los enemigos
 	
 	// Mapa
 	protected MapaUno mapa;
@@ -26,6 +27,7 @@ public abstract class Enemigo extends Sprite {
 	protected int puntosDeVida;
 	protected boolean muerto;
 	protected int daño; // Daño que hace el enemigo al atacar
+	protected int id;
 	
 	// Animaciones
 	protected Animation animacionMovimiento;
@@ -58,6 +60,7 @@ public abstract class Enemigo extends Sprite {
 		muerto = false;
 		puntosDeVida = vida;
 		this.daño = daño;
+		this.id = MAX_ID++;
 	}
 	
 	// Update
@@ -100,6 +103,22 @@ public abstract class Enemigo extends Sprite {
 			return (TextureRegion)animacionAturdido.getKeyFrame(tiempo);
 		// Por defecto devuelve la animación de movimiento
 		return (TextureRegion) animacionMovimiento.getKeyFrame(tiempo, true);
+	}
+	// Textura remoto
+	public TextureRegion getFrame ( float tiempoAnimacion , boolean aturdido , boolean direccionDerecha ) {
+		TextureRegion textura = null;
+		// Si está aturdido devuelve el frame de aturdimiento
+		if ( aturdido )
+			textura = (TextureRegion)animacionAturdido.getKeyFrame(tiempoAnimacion);
+		else // Por defecto devuelve la animación de movimiento
+			textura = (TextureRegion) animacionMovimiento.getKeyFrame(tiempoAnimacion, true);
+		
+		// Comprueba si es necesario invertir el frame
+		if ( (direccionDerecha && textura.isFlipX()) || (!direccionDerecha && !textura.isFlipX()) )
+			textura.flip(true, false);
+		
+		// Devuelve la textura
+		return textura;
 	}
 	
 	// Movimiento por defecto del enemigo ( se moverá entre los límites puestos en el tileMap )
@@ -146,11 +165,26 @@ public abstract class Enemigo extends Sprite {
 	public Body getCuerpo() {
 		return cuerpo;
 	}
+	public boolean getAturdido() {
+		return aturdido;
+	}
+	public boolean getDireccion(){
+		return direccionDerecha;
+	}
+	public int getDaño() {
+		return daño;
+	}
 	public int getPuntosDeVida() {
 		return puntosDeVida;
 	}
 	public boolean getMuerto ( ) {
 		return muerto;
+	}
+	public int getId() {
+		return id;
+	}
+	public float getTiempo() {
+		return tiempo;
 	}
 
 }

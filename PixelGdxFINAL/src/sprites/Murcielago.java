@@ -24,7 +24,7 @@ public class Murcielago extends Enemigo{
 	
 	
 	// Constructor
-	public Murcielago ( MapaUno mapa , float x , float y ) {
+	public Murcielago ( MapaUno mapa , float x , float y  ) {
 		super(mapa, x, y, WIDTH, HEIGHT , SPRITE_WIDTH, SPRITE_HEIGHT , MAX_VIDA , DAÑO_ATAQUE);
 	}
 

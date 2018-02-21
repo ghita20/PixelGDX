@@ -12,12 +12,16 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import juego.PixelGdx;
+import sockets.DatosSincronizar;
+import sprites.Moneda;
 import sprites.Murcielago;
+import sprites.NpcHerrero;
 import util.BodyCreator;
 import util.Colisiones;
 import util.GestionAudio;
@@ -48,17 +52,21 @@ public class MapaUno implements Screen {
 	private Box2DDebugRenderer debugRender; // Imprime los límites de cada objeto que hay en el world
 	private final float GRAVEDAD = -5; 	// Gravedad
 	
+	// Npcs
+	private NpcHerrero herrero;
+	
+	// Datos que se recogen en cada update y que se enviarán al socket remoto
+	private DatosSincronizar datosEnviar;
+	
 	// Constructor
 	public MapaUno ( PixelGdx juego ) {
-		// Musica de fondo
-		GestionAudio.MUSICA_FONDO.play();
 		
 		// Juego
 		this.juego = juego;
 
         // World - fisica
         world = new World( new Vector2( 0 , GRAVEDAD), true);
-        world.setContactListener( new Colisiones() ); // Gestor de colisiones
+        world.setContactListener( new Colisiones(this) ); // Gestor de colisiones
 		
 		// Instancia la camara principal
 		gameCam = new OrthographicCamera();
@@ -74,6 +82,9 @@ public class MapaUno implements Screen {
         gameCam.setToOrtho(false, PixelGdx.WIDTH / PixelGdx.PPM / 1.8f, PixelGdx.HEIGHT / PixelGdx.PPM / 1.8f);
         gameCam.update();
         
+        // Herrero
+        herrero = new NpcHerrero(this, 0.4f, 1.2f);
+        
         // Gestion jugadores
         jugadores = new GestionJugadores(this);
         
@@ -86,13 +97,16 @@ public class MapaUno implements Screen {
         // Gestion loot
         loot = new GestionLoot(this);
         
+        
         // Debug Render
         debugRender = new Box2DDebugRenderer();
-        
 	}
 	
-	// Update
+	// Actualiza el estado de los objetos y recoge información para sincronizar
 	public void update( float delta ) {
+		// Nuevo objeto de sincronización. Los datos se irán recogiendo en cada update de los objetos
+		datosEnviar = new DatosSincronizar();
+		
 		// Actualiza el estado del mundo y elimina los cuerpos que tiene pendientes de eliminar
 		worldUpdate.update();
 		
@@ -105,11 +119,17 @@ public class MapaUno implements Screen {
 		// Actualiza el loot
 		loot.update(delta);
 		
+		// Actualiza el npc
+		herrero.update(delta);
+		
 		// Actualiza la camara para que siga al jugador
 		updateCam(delta,jugadores.getJugadorPrincipal().getCuerpo().getPosition().x,jugadores.getJugadorPrincipal().getCuerpo().getPosition().y);
 
 		// Actualiza el renderer del mapa
 		mapa.update(gameCam);
+		
+		// Envía la información
+		juego.getConexionSocket().enviarDatos(datosEnviar);
 		
 	}
 	
@@ -158,14 +178,15 @@ public class MapaUno implements Screen {
         
         // Empieza el renderizado
         juego.getBatch().begin();
-        
 	        
 	        // Renderiza los mobs
 	        mobs.render(juego.getBatch());
 	        
 	        // Renderiza el loot
 	        loot.render(juego.getBatch());
-	        
+
+        	// Npc Herrero
+        	herrero.draw(juego.getBatch());
 
 			// Renderiza los jugadores ( Hay que dejar que lo último que se renderize sea el jugador porque el se encargará de cerrar el batch )
 	        jugadores.render( juego.getBatch() );
@@ -175,14 +196,14 @@ public class MapaUno implements Screen {
         
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
+	// Crea monedas en un sitio especifico
+	public void crearMuchasMonedas ( ) {
+		for ( int i = 0; i<=30;i++) 
+			for(int j = 0; j<= 100 ; j++) {
+				Moneda auxM = new Moneda(MapaUno.this, 2+ (j*0.1f), 4 + (0.1f*i), BodyType.StaticBody, true);
+				loot.addLoot( auxM);
+			}
+	}
 	
 	
 	// Getters
@@ -205,6 +226,12 @@ public class MapaUno implements Screen {
 	}
 	public GestionesMapaUno getGestionesMapa() {
 		return mapa;
+	}
+	public NpcHerrero getHerrero() {
+		return herrero;
+	}
+	public DatosSincronizar getDatosEnviar() {
+		return datosEnviar;
 	}
 	
 	

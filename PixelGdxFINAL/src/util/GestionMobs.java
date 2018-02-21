@@ -13,6 +13,9 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 import juego.PixelGdx;
 import pantallas.MapaUno;
+import sockets.DatosJugador;
+import sockets.DatosMob;
+import sockets.DatosMobs;
 import sprites.Enemigo;
 import sprites.Loot;
 import sprites.Moneda;
@@ -45,6 +48,16 @@ public class GestionMobs {
 	
 	// Update
 	public void update( float delta ) {
+		// Si soy el servidor actualizo los mobs y genero un objeto DatosMobs con información
+		if ( mapa.getJuego().getConexionSocket().getEsServidor()) {
+			updateMobs(delta);
+			agregarDatosMobs();
+		}else // Sincronizo los mobs con los datos del servidor
+			sincronizarMobs();	
+	}
+	
+	// Actualiza el estado de los mobs
+	private void updateMobs(float delta) {
 		// Itera sobre los enemigos
 		Iterator<Enemigo> iterador = enemigos.iterator();
 		// Recorre los enemigos
@@ -55,20 +68,79 @@ public class GestionMobs {
 				enemigo.update(delta);
 			else { // Si está muerto lo añade a li lista de cuerpos a eliminar
 				mapa.getWorldUpdate().addCuerpo(enemigo.getCuerpo());
-				
+
 				// Genera el loot aleatoriamente
 				int random = (int) (Math.random()*10);
 				System.out.println(random);
 				if ( random > 5) {
-					Loot auxLoot = new Moneda(mapa,enemigo.getCuerpo().getPosition().x,enemigo.getCuerpo().getPosition().y,BodyType.StaticBody);
+					Loot auxLoot = new Moneda(mapa,enemigo.getCuerpo().getPosition().x,enemigo.getCuerpo().getPosition().y,BodyType.StaticBody,true);
 					// Lo añade al mundo
 					mapa.getLoot().addLoot(auxLoot); 
 				}
-				
+
 				// y lo elimina del arraylist
 				iterador.remove();
 			}
 		}
+	}
+	
+	// Sincroniza lo mobs
+	private void sincronizarMobs() {
+		if ( mapa.getJuego().getConexionSocket().recogerDatos() != null ) {
+			// Recoge el objeto recibido
+			DatosMobs datosMobs = mapa.getJuego().getConexionSocket().recogerDatos().getDatosMobs();
+			
+			// Itera sobre los enemigos
+			Iterator<Enemigo> iterador = enemigos.iterator();
+			// Recorre los enemigos
+			while ( iterador.hasNext() ) {
+				Enemigo enemigo = iterador.next();
+				int j = 0;
+				while ( j < datosMobs.getMobs().size() ) {
+					// Actualiza el estado del mob
+					if ( enemigo.getId() == datosMobs.getMobs().get(j).getId()) {
+						// Actualiza la posición
+						enemigo.getCuerpo().setTransform(datosMobs.getMobs().get(j).getPosicion(), 0);
+						// Actualiza la posición del sprite
+						enemigo.setPosition(
+								enemigo.getCuerpo().getPosition().x - enemigo.getWidth()/2, 
+								enemigo.getCuerpo().getPosition().y - enemigo.getHeight()/2);
+						// Le asigna su textura
+						enemigo.setRegion( enemigo.getFrame(
+								datosMobs.getMobs().get(j).getTiempoAnimacion(),
+								datosMobs.getMobs().get(j).getAturdido(),
+								datosMobs.getMobs().get(j).getDireccionDerecha()));
+						break; // Sale del while
+					}
+					j++;
+				}
+				// Si ha llegado al final y no encuentra el mob significa que habrá muerto
+				if ( j == datosMobs.getMobs().size()) {
+					// Borra su cuerpo
+					mapa.getWorldUpdate().addCuerpo(enemigo.getCuerpo());
+					// Lo elimina del arraylist
+					iterador.remove();
+				}
+			}
+		}
+	}
+
+	// Agrega los datos de los mobs al objeto que enviará por el socket
+	private void agregarDatosMobs ( ) {
+		// Si soy el cliente genero un objeto DatosMobs con información de los mobs
+		DatosMobs datosMobs = new DatosMobs();
+		// Recorro los mobs
+		for ( Enemigo e : enemigos ) {
+			DatosMob datoE = new DatosMob();
+			datoE.setPosicion(e.getCuerpo().getPosition());
+			datoE.setId(e.getId());
+			datoE.setAturdido(e.getAturdido());
+			datoE.setTiempoAnimacion(e.getTiempo());
+			datoE.setDireccionDerecha(e.getDireccion());
+			// 
+			datosMobs.addMob(datoE);
+		}
+		mapa.getDatosEnviar().setDatosMobs(datosMobs);
 	}
 	
 	// Render

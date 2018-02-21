@@ -11,14 +11,21 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 
 import juego.PixelGdx;
+import otros.Espada;
+import otros.Espada.TiposEspada;
 import pantallas.MapaUno;
 import util.BodyCreator;
 import util.GestionAudio;
 
 public class Jugador extends Sprite{
+	
+	// Tipos de jugador
+	public enum TipoJugador{ PRINCIPAL, REMOTO }
+	private TipoJugador tipoJugador; // Tipo de jugador
 	
 	private MapaUno mapa; // Mapa actual
 	
@@ -42,23 +49,19 @@ public class Jugador extends Sprite{
 	private TextureRegion jugadorQuieto; 	// Quieto
 	private TextureRegion jugadorMuerto; 	// Muerto
 	
-	// Tipos de espadas
-	public enum Espada{
-		BASICA , TOCHA
-	}
-	private int DAÑO_ESPADA_BASICA = 1;
-	private int DAÑO_ESPADA_TOCHA = 4;
+	// Espada
 	private Espada espada;
 	
 	// Poderes
 	private ArrayList<OndaEspada> ondasEspada; // Ondas que genera la espada al atacar
+	private Body cuerpo; // Cuerpo
 	
-	// Body
-	private Body cuerpo;
+	// Booleano para saber si está en colisionando con el npc
+	private boolean colisionNPC;
 	
 	// Salto
 	private int numeroSaltos; // Cada vez que el jugador salta aumenta el numero de saltos, al tocar con el suelo se reinicia
-	private final int MAX_SALTOS = 2; // Número máximo de saltos
+	private final int MAX_SALTOS = 222; // Número máximo de saltos
 	
 	// Vida
 	public static final int MAX_VIDA = 24;
@@ -68,8 +71,9 @@ public class Jugador extends Sprite{
 	private int cantidadMonedas; // Número de monedas del jugador
 	
 	// Constructor
-	public Jugador ( MapaUno mapa , String personaje ) {
-		
+	public Jugador ( MapaUno mapa , String personaje , TipoJugador tipoJugador) {
+		// Tipo de jugador
+		this.tipoJugador = tipoJugador;
 		// Carga las animaciones
 		cargarAnimaciones(personaje);
 		
@@ -86,10 +90,11 @@ public class Jugador extends Sprite{
 		direccionDerecha = true;
 		tiempoEstado = 0;
 		puntosDeVida = MAX_VIDA;
-		espada = Espada.TOCHA;
+		espada = new Espada(Espada.TiposEspada.BASICA);
 		muerto = false;
 		this.mapa = mapa;
 		cantidadMonedas = 0;
+		colisionNPC = false;
 		
 		// Instancia el arrayList de ondas
 		ondasEspada = new ArrayList<>();
@@ -103,11 +108,16 @@ public class Jugador extends Sprite{
 		// Actualiza la posicion del sprite asignandola la del cuerpo fisico
 		setPosition(cuerpo.getPosition().x - getWidth() / 2, cuerpo.getPosition().y - getHeight() / 2 );
 		// Asigna el frame segun el estado del personaje
-		setRegion( getFrame(delta) );
+		setRegion( getFrame(delta,null,0,false) );
 		
+		// Actualiza el estado de las ondas
+		actualizarOndasEspada(delta);
+	}
+	
+	// Actualiza el estado de las ondas
+	public void actualizarOndasEspada ( float delta ) {
 		// Índice de las ondas que han acabado su animación
 		ArrayList<Integer> indicesOndas = new ArrayList<>();
-		
 		// Actualiza el estado de todas las ondas del personaje
 		for ( int i = ondasEspada.size() -1 ; i >= 0 ; i--) {
 			// Recoge la onda
@@ -121,7 +131,7 @@ public class Jugador extends Sprite{
 			}else
 				onda.update(delta);
 		}
-		
+
 		// Elimina las ondas que han acabado su animación
 		for ( int i : indicesOndas )
 			ondasEspada.remove(i);
@@ -132,8 +142,13 @@ public class Jugador extends Sprite{
 	public void draw(Batch batch) {
 		// Se pinta a si mismo
 		super.draw(batch);
-		
 		// También se encarga de pintar sus ondas
+		drawOndas(batch);
+	}
+	
+	// Dibuja las ondas en pantalla
+	public void drawOndas ( Batch batch ) {
+		// Pinta las ondas
 		for ( OndaEspada onda : ondasEspada)
 			onda.draw(batch);
 	}
@@ -173,39 +188,44 @@ public class Jugador extends Sprite{
 			
 			// Ataque
 			if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-				atacar();
+				atacar(true);
 			}
 			
 			// Cambiar de espada
 			if ( Gdx.input.isKeyJustPressed( Input.Keys.E )) {
-				if ( espada == Espada.BASICA)
-					espada = Espada.TOCHA;
-				else
-					espada = Espada.BASICA;
+				lanzarMonedas();
 			}
 			
-			// Pruebas
-			if ( Gdx.input.isKeyJustPressed( Input.Keys.Q )) {
-				mapa.getJugadores().getStatsJugador().mostrarDialogoNpc();
-			}
+			// Si está en colisión con el NPC y pulsa la Q imprime el dialogo
+			if ( colisionNPC ) 
+				if ( Gdx.input.isKeyJustPressed( Input.Keys.Q ))
+					mapa.getJugadores().getStatsJugador().mostrarDialogoNpc();
 		}
 		
 	}
 
 	// Ataca lanzando una onda
-	private void atacar() {
-		// Crea una nueva onda y la añade al arrayList. El tamaño de la onda varía según la espada
-		ondasEspada.add( new OndaEspada(this, 
-				espada == Espada.TOCHA?42:32 , 
-				espada == Espada.TOCHA?42:32 ,
-				espada == Espada.TOCHA?10:8,
-				espada == Espada.TOCHA?12:10
-		));
-		// Atacando
-		atacando = true;
-		tiempoEstado = 0;
-		// Sonido
-		GestionAudio.SONIDO_ESPADA.play();
+	public void atacar( boolean enviarRemoto ) {
+		// Solo puedes atacar si tienes espada
+		if ( espada != null) {
+			// Crea una nueva onda y la añade al arrayList. El tamaño de la onda varía según la espada
+			ondasEspada.add( new OndaEspada(this, 
+					espada.getTipo(),
+					espada.getTipo() == Espada.TiposEspada.TOCHA?42:32 , 
+					espada.getTipo() == Espada.TiposEspada.TOCHA?42:32 ,
+					espada.getTipo() == Espada.TiposEspada.TOCHA?10:8,
+					espada.getTipo() == Espada.TiposEspada.TOCHA?22:10
+			));
+			// Atacando
+			atacando = true;
+			tiempoEstado = 0;
+			// Sonido
+			GestionAudio.SONIDO_ESPADA.play();
+			
+			if ( enviarRemoto)
+				// Cada vez que ataca manda información al remoto si así se quiere
+				mapa.getJuego().getConexionSocket().enviarDatos(true);
+		}
 	}
 	// Aturde al jugador por un tiempo
 	public void aturdir ( ) {
@@ -249,9 +269,10 @@ public class Jugador extends Sprite{
 	}
 	
 	// Devuelve el frame actual del jugador
-	public TextureRegion getFrame ( float delta ) {
-		// Recupera el estado actual
-		Estado estadoActual = getEstado();
+	public TextureRegion getFrame ( float delta , Estado estadoActual , float tiempoAnimacion , boolean remoto) {
+		// Recupera el estado actual si el estado pasado como argumento es null
+		if ( estadoActual == null )
+			estadoActual = getEstado();
 		
 		// Textura actual del jugador
 		TextureRegion region = null;
@@ -259,7 +280,7 @@ public class Jugador extends Sprite{
 		switch( estadoActual ) {
 		// Corriendo
 		case CORRIENDO: 
-			region = (TextureRegion) jugadorCorriendo.getKeyFrame(tiempoEstado, true);
+			region = (TextureRegion) jugadorCorriendo.getKeyFrame(remoto?tiempoAnimacion:tiempoEstado, true);
 			break;
 		// Quieto o Cayendo
 		case QUIETO: case CAYENDO:
@@ -267,14 +288,14 @@ public class Jugador extends Sprite{
 			break;
 		// Saltando	
 		case SALTANDO:
-			region = (TextureRegion) jugadorSaltando.getKeyFrame(tiempoEstado);
+			region = (TextureRegion) jugadorSaltando.getKeyFrame(remoto?tiempoAnimacion:tiempoEstado);
 			break;
 		// Atacando
 		case ATACANDO:
-			if ( espada == Espada.BASICA)
-				region = (TextureRegion) jugadorAtacando.getKeyFrame(tiempoEstado);
+			if ( espada.getTipo() == TiposEspada.BASICA)
+				region = (TextureRegion) jugadorAtacando.getKeyFrame(remoto?tiempoAnimacion:tiempoEstado);
 			else
-				region = (TextureRegion) jugadorAtacandoTocha.getKeyFrame(tiempoEstado);
+				region = (TextureRegion) jugadorAtacandoTocha.getKeyFrame(remoto?tiempoAnimacion:tiempoEstado);
 			break;
 		// TODO: Muerto
 		case MUERTO:
@@ -282,7 +303,7 @@ public class Jugador extends Sprite{
 			break;
 		// Aturdido
 		case ATURDIDO:
-			region = (TextureRegion) jugadorAturdido.getKeyFrame(tiempoEstado);
+			region = (TextureRegion) jugadorAturdido.getKeyFrame(remoto?tiempoAnimacion:tiempoEstado);
 			break;
 		}
 		
@@ -296,12 +317,12 @@ public class Jugador extends Sprite{
 			// Cambia la dirección del jugador 
 			direccionDerecha = true;
 		}
-			
-		// Si está en el mismo estado que el anterior aumenta el tiempo que lleva en ese estado si no, lo reinicia a 0
-		tiempoEstado = estadoActual == estadoAnterior ? tiempoEstado + delta : 0; 
-		// El estado anterior se convierte en el estado actual
-		estadoAnterior = estadoActual;
-		
+		if ( !remoto ) {
+			// Si está en el mismo estado que el anterior aumenta el tiempo que lleva en ese estado si no, lo reinicia a 0
+			tiempoEstado = estadoActual == estadoAnterior ? tiempoEstado + delta : 0; 
+			// El estado anterior se convierte en el estado actual
+			estadoAnterior = estadoActual;
+		}
 		// Devuelve la textura
 		return region;
 	}
@@ -362,6 +383,9 @@ public class Jugador extends Sprite{
 	public Body getCuerpo() {
 		return cuerpo;
 	}
+	public TipoJugador getTipoJugador() {
+		return tipoJugador;
+	}
 	public boolean enDireccionDerecha ( ) {
 		return direccionDerecha;
 	}
@@ -375,13 +399,25 @@ public class Jugador extends Sprite{
 		return muerto;
 	}
 	public int getPuntosAtaque ( ) {
-		// El ataque varía según el tipo de espada
-		if ( espada == Espada.TOCHA )
-			return DAÑO_ESPADA_TOCHA;
-		return DAÑO_ESPADA_BASICA;
+		return espada.getDaño();
 	}
 	public int getCantidadMonedas() {
 		return cantidadMonedas;
+	}
+	public boolean getColisionNpc ( ) {
+		return colisionNPC;
+	}
+	public Espada getEspada() {
+		return espada;
+	}
+	public void setColisionNPC(boolean colisionNPC) {
+		this.colisionNPC = colisionNPC;
+	}
+	public float getTiempoEstado() {
+		return tiempoEstado;
+	}
+	public boolean getAtacando (){
+		return atacando;
 	}
 	
 	// Otros métodos
@@ -400,17 +436,18 @@ public class Jugador extends Sprite{
 	public void addMoneda ( ) {
 		cantidadMonedas++;
 	}
-	// Mejora el daño de la espada
-	public void mejorarEspada ( Espada tipoEspada ) {
-		if ( tipoEspada == Espada.TOCHA )
-			DAÑO_ESPADA_TOCHA += 2;
-		if ( tipoEspada == Espada.BASICA )
-			DAÑO_ESPADA_BASICA +=2;
+	public void lanzarMonedas ( ) {
+//		for ( int i = 0; i < 20 ; i++ ) {
+//			Moneda auxM = new Moneda(mapa, cuerpo.getPosition().x+ (i*0.1f), cuerpo.getPosition().y + (0.1f*i), BodyType.StaticBody, true);
+//			mapa.getLoot().addLoot( auxM);
+//		}
+		mapa.crearMuchasMonedas();
 	}
+	
 	
 	// Resta monedas
 	public void restarMonedas ( int monedasRestar ) throws IllegalArgumentException{
-		if ( monedasRestar - cantidadMonedas < 0 )
+		if ( cantidadMonedas - monedasRestar < 0 )
 			throw new IllegalArgumentException("No tienes las monedas suficientes.");
 		cantidadMonedas -= monedasRestar;
 		if ( cantidadMonedas < 0 )
