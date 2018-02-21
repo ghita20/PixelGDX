@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 public class SocketServidor extends PixelSocket{
 	
 	// IP y Puerto por defecto
-	public static final String IP = "localhost";
+	public static final String IP = "192.156.56.1";
 	public static final int PUERTO = 50000;
 	
 	// Socket servidor
@@ -19,7 +19,7 @@ public class SocketServidor extends PixelSocket{
 		super(IP, PUERTO, true);
 		// Crea el socket servidor
 		try {
-			socketServidor = new ServerSocket(50000, 1, InetAddress.getByName("localhost"));
+			socketServidor = new ServerSocket(PUERTO, 1, InetAddress.getByName(IP));
 			// Aún nadie se ha conectado a nuestro servidor
 			socketRemoto = null;
 			// Espera a que un cliente se conecte
