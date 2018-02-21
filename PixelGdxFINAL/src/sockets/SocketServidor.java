@@ -2,14 +2,15 @@ package sockets;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 public class SocketServidor extends PixelSocket{
 	
 	// IP y Puerto por defecto
-	public static final String IP = "192.156.56.1";
-	public static final int PUERTO = 50000;
+	public static final String IP = "192.168.0.154";
+	public static final int PUERTO = 60000;
 	
 	// Socket servidor
 	private ServerSocket socketServidor;

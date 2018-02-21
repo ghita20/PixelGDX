@@ -69,10 +69,12 @@ public abstract class PixelSocket {
 		// OutputStream
 		ObjectOutputStream outStream;
 		try {
-			// OutputStream del socket remoto
-			outStream = new ObjectOutputStream(socketRemoto.getOutputStream());
-			// Envía el objeto
-			outStream.writeObject(datosEnviar);
+			if ( socketRemoto != null ) {
+				// OutputStream del socket remoto
+				outStream = new ObjectOutputStream(socketRemoto.getOutputStream());
+				// Envía el objeto
+				outStream.writeObject(datosEnviar);
+			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
