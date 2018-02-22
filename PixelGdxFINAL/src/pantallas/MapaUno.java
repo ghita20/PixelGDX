@@ -104,6 +104,7 @@ public class MapaUno implements Screen {
         
         // Añade la espada tocha xD
         loot.addLoot( new EspadaTocha(this, 11.4f, 12.0f, 32f, 64f, BodyType.StaticBody, true));
+        loot.addLoot( new EspadaTocha(this, 11.6f, 4f, 32f, 64f, BodyType.StaticBody, true));
 	}
 	
 	// Actualiza el estado de los objetos y recoge información para sincronizar

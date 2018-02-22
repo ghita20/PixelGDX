@@ -61,7 +61,7 @@ public class Jugador extends Sprite{
 	
 	// Salto
 	private int numeroSaltos; // Cada vez que el jugador salta aumenta el numero de saltos, al tocar con el suelo se reinicia
-	private final int MAX_SALTOS = 222; // Número máximo de saltos
+	private final int MAX_SALTOS = 2; // Número máximo de saltos
 	
 	// Vida
 	public static final int MAX_VIDA = 24;

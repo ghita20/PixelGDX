@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="197" height="200" tilewidth="16" tileheight="16" backgroundcolor="#000000" nextobjectid="367">
+<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="197" height="200" tilewidth="16" tileheight="16" backgroundcolor="#000000" nextobjectid="370">
  <tileset firstgid="1" source="tsx/tileset.tsx"/>
  <tileset firstgid="1161" source="tsx/sky.tsx"/>
  <tileset firstgid="1294" source="tsx/farground.tsx"/>
@@ -51,7 +51,7 @@
   <object id="239" x="1695" y="2302"/>
   <object id="240" x="1734" y="2304"/>
  </objectgroup>
- <objectgroup name="murcielagos">
+ <objectgroup name="murcielagos" visible="0">
   <object id="105" x="406.667" y="3026"/>
   <object id="106" x="584.667" y="3026"/>
   <object id="107" x="772" y="3027.33"/>
@@ -236,10 +236,26 @@
     <property name="tipo" value="abajo"/>
    </properties>
   </object>
-  <object id="234" x="1863" y="2256" width="10" height="89"/>
-  <object id="235" x="1959" y="2249" width="10" height="100"/>
-  <object id="237" x="1608" y="2255" width="9" height="91"/>
-  <object id="238" x="1725" y="2263" width="11" height="84"/>
+  <object id="234" x="1863" y="2256" width="10" height="89">
+   <properties>
+    <property name="tipo" value="izquierda"/>
+   </properties>
+  </object>
+  <object id="235" x="1959" y="2249" width="10" height="100">
+   <properties>
+    <property name="tipo" value="derecha"/>
+   </properties>
+  </object>
+  <object id="237" x="1608" y="2255" width="9" height="91">
+   <properties>
+    <property name="tipo" value="izquierda"/>
+   </properties>
+  </object>
+  <object id="238" x="1730" y="2263" width="6" height="84">
+   <properties>
+    <property name="tipo" value="izquierda"/>
+   </properties>
+  </object>
   <object id="241" x="993" y="2234" width="383" height="9">
    <properties>
     <property name="tipo" value="abajo"/>
@@ -261,6 +277,16 @@
    </properties>
   </object>
   <object id="354" x="1223.33" y="2168.67" width="9.33333" height="68.6667">
+   <properties>
+    <property name="tipo" value="derecha"/>
+   </properties>
+  </object>
+  <object id="367" x="1842.5" y="2253.5" width="8" height="95.5">
+   <properties>
+    <property name="tipo" value="derecha"/>
+   </properties>
+  </object>
+  <object id="369" x="1715" y="2260.5" width="5.5" height="95.5">
    <properties>
     <property name="tipo" value="derecha"/>
    </properties>
@@ -449,7 +475,7 @@
   <object id="212" x="2050" y="2453" width="53" height="25"/>
   <object id="366" x="-63.6364" y="1569.7" width="63.6364" height="1615.15"/>
  </objectgroup>
- <objectgroup name="muerte">
+ <objectgroup name="muerte" visible="0">
   <object id="365" x="-751.515" y="3178.79" width="5133.33" height="63.6364"/>
  </objectgroup>
 </map>
