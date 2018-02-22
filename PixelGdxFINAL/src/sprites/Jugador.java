@@ -195,11 +195,15 @@ public class Jugador extends Sprite{
 			if ( Gdx.input.isKeyJustPressed( Input.Keys.E )) {
 				lanzarMonedas();
 			}
-			
 			// Si está en colisión con el NPC y pulsa la Q imprime el dialogo
 			if ( colisionNPC ) 
 				if ( Gdx.input.isKeyJustPressed( Input.Keys.Q ))
 					mapa.getJugadores().getStatsJugador().mostrarDialogoNpc();
+		}
+		// Revivir
+		if ( Gdx.input.isKeyJustPressed( Input.Keys.R ) ) {
+			muerto = false;
+			puntosDeVida = MAX_VIDA;
 		}
 		
 	}
@@ -437,11 +441,23 @@ public class Jugador extends Sprite{
 		cantidadMonedas++;
 	}
 	public void lanzarMonedas ( ) {
-//		for ( int i = 0; i < 20 ; i++ ) {
-//			Moneda auxM = new Moneda(mapa, cuerpo.getPosition().x+ (i*0.1f), cuerpo.getPosition().y + (0.1f*i), BodyType.StaticBody, true);
-//			mapa.getLoot().addLoot( auxM);
-//		}
-		mapa.crearMuchasMonedas();
+		for ( int i = 0; i<=10;i++) 
+			for(int j = 0; j<= 10 ; j++) {
+				Moneda auxM = new Moneda(mapa, cuerpo.getPosition().x+ (j*0.1f), cuerpo.getPosition().y + (0.1f*i), BodyType.StaticBody, true);
+				mapa.getLoot().addLoot( auxM );
+			}
+	}
+	
+	// Reinicia la posición del jugador
+	public void reiniciarPosicion ( ) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// Como esto se suele lanzar desde una colisión, hay que esperar a que el mapa este desbloqueado para cambiar la posición
+				while ( mapa.getWorld().isLocked());
+				cuerpo.setTransform(new Vector2(1.0f,1.1f), 0);
+			}
+		}).start();
 	}
 	
 	

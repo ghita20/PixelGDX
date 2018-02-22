@@ -1,6 +1,8 @@
 package otros;
 
-public class Espada {
+import java.io.Serializable;
+
+public class Espada implements Serializable{
 	// Tipos de espada
 	public enum TiposEspada{ BASICA , TOCHA }
 	// Daño por defecto

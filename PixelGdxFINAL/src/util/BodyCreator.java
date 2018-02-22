@@ -211,6 +211,49 @@ public final class BodyCreator {
 		return cuerpo;
 	}
 
+	// Crea la capa de muerte ( el vacío )
+	public static void crearVacio (  World world , TiledMap map ) {
+		// Variables auxiliares
+		BodyDef bdef = new BodyDef();
+		FixtureDef fdef = new FixtureDef();
+		Body body;
+
+		// Recorre la capa e instancia los objetos tipo Rectangulo que existen en el tileMap
+		for(MapObject object : map.getLayers().get(11).getObjects().getByType(RectangleMapObject.class)){
+			// Consigue el objeto Rectangle
+			Rectangle rect = ((RectangleMapObject) object).getRectangle();
+
+			// El suelo es de tipo estático para que esté siempre en el mismo sitio y no le afecten los golpes etc..
+			bdef.type = BodyDef.BodyType.StaticBody;
+			// Posicion
+			bdef.position.set(
+					(rect.getX() + rect.getWidth() / 2f) / PixelGdx.PPM, // Hay que ajustar la posición a lo pixeles por metro establecidos
+					(rect.getY() + rect.getHeight() / 2f) / PixelGdx.PPM);
+
+			// Crea la definición del cuerpo en el mundo
+			body = world.createBody(bdef);
+
+			// Ahora le asigna una forma de polígono
+			PolygonShape shape = new PolygonShape();
+			shape.setAsBox(
+					rect.getWidth() / 2f / PixelGdx.PPM, 
+					rect.getHeight() / 2f / PixelGdx.PPM);
+			fdef.shape = shape;
+
+			// Categoria
+			fdef.filter.categoryBits = Colisiones.CATEGORIA_VACIO;
+			// Máscara para las colisiones
+			fdef.filter.maskBits = Colisiones.MASK_VACIO;
+
+			// Le da forma al objeto
+			body.createFixture(fdef);
+
+			// Dispose
+			shape.dispose();
+
+		}
+	}
+	
 	// Crea un cuerpo para los enemigos
 	public static Body crearCuerpoEnemigo ( World world , Sprite sprite , float x , float y , float width , float heigh ) {
 		// Definición del cuerpo

@@ -28,6 +28,9 @@ public abstract class Loot extends Sprite{
 	
 	// Constructor
 	public Loot ( MapaUno mapa , float x , float y , float spriteWidth , float spriteHeight, BodyType tipo , boolean sensor) {
+		this(mapa, x, y, spriteWidth, spriteHeight, tipo, sensor, MAX_ID++);
+	}
+	public Loot ( MapaUno mapa , float x , float y , float spriteWidth , float spriteHeight, BodyType tipo , boolean sensor, int id) {
 		// Cuerpo 
 		cuerpo = BodyCreator.crearCuerpoLoot(mapa.getWorld(), this, x, y, 8, 8, tipo, sensor);
 		// Carga la animación
@@ -40,7 +43,7 @@ public abstract class Loot extends Sprite{
 		setRegion( (TextureRegion)animacion.getKeyFrame(0f)  );
 		// por defecto no estña cogido
 		cogido = false;
-		id = MAX_ID++;
+		this.id = id;
 	}
 
 	// Update

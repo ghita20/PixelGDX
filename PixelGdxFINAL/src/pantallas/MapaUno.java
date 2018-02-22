@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import juego.PixelGdx;
 import sockets.DatosSincronizar;
+import sprites.EspadaTocha;
 import sprites.Moneda;
 import sprites.Murcielago;
 import sprites.NpcHerrero;
@@ -100,6 +101,9 @@ public class MapaUno implements Screen {
         
         // Debug Render
         debugRender = new Box2DDebugRenderer();
+        
+        // Añade la espada tocha xD
+        loot.addLoot( new EspadaTocha(this, 11.4f, 12.0f, 32f, 64f, BodyType.StaticBody, true));
 	}
 	
 	// Actualiza el estado de los objetos y recoge información para sincronizar
@@ -180,7 +184,7 @@ public class MapaUno implements Screen {
         juego.getBatch().begin();
 	        
 	        // Renderiza los mobs
-	        mobs.render(juego.getBatch());
+	       	mobs.render(juego.getBatch());
 	        
 	        // Renderiza el loot
 	        loot.render(juego.getBatch());
@@ -191,20 +195,10 @@ public class MapaUno implements Screen {
 			// Renderiza los jugadores ( Hay que dejar que lo último que se renderize sea el jugador porque el se encargará de cerrar el batch )
 	        jugadores.render( juego.getBatch() );
         
-		// Termina el renderizado ( lo termina el jugador en su render porque  )
+		// Termina el renderizado ( lo termina el jugador en su render )
         //juego.getBatch().end();
         
 	}
-	
-	// Crea monedas en un sitio especifico
-	public void crearMuchasMonedas ( ) {
-		for ( int i = 0; i<=30;i++) 
-			for(int j = 0; j<= 100 ; j++) {
-				Moneda auxM = new Moneda(MapaUno.this, 2+ (j*0.1f), 4 + (0.1f*i), BodyType.StaticBody, true);
-				loot.addLoot( auxM);
-			}
-	}
-	
 	
 	// Getters
 	public PixelGdx getJuego() {

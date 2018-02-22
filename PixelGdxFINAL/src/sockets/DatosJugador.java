@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import com.badlogic.gdx.math.Vector2;
 
+import otros.Espada;
 import sprites.Jugador.Estado;
 
 public class DatosJugador implements Serializable{
@@ -15,6 +16,7 @@ public class DatosJugador implements Serializable{
 	private Estado estado;
 	private float tiempoEstado;
 	private boolean atacando;
+	private Espada espada;
 	
 	// Constructor
 	public DatosJugador() {	}
@@ -38,6 +40,9 @@ public class DatosJugador implements Serializable{
 	public void setAtacando(boolean atacando) {
 		this.atacando = atacando;
 	}
+	public void setEspada(Espada espada) {
+		this.espada = espada;
+	}
 	
 	// Getters
 	public Vector2 getPosicion() {
@@ -51,6 +56,9 @@ public class DatosJugador implements Serializable{
 	}
 	public Estado getEstado() {
 		return estado;
+	}
+	public Espada getEspada() {
+		return espada;
 	}
 	public boolean getAtacando() {
 		return atacando;

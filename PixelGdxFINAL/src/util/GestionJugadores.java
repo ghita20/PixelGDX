@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
 import hud.StatsJugador;
+import otros.Espada;
 import pantallas.MapaUno;
 import sockets.Ataque;
 import sockets.DatosJugador;
@@ -34,10 +35,10 @@ public class GestionJugadores {
 		// Mapa
 		this.mapa = mapa;
 		// Jugador servidor
-		jugadorServidor = new Jugador(mapa, "rey", TipoJugador.REMOTO);
+		jugadorServidor = new Jugador(mapa, "rey", TipoJugador.PRINCIPAL);
 		
 		// Jugador cliente
-		jugadorCliente = new Jugador(mapa, "rey_rojo", TipoJugador.PRINCIPAL);
+		jugadorCliente = new Jugador(mapa, "rey_rojo", TipoJugador.REMOTO);
 		
 		// Stats del jugador
 		statsJugador = new StatsJugador(mapa.getJuego().getBatch(), getJugadorPrincipal(),mapa.getHerrero());
@@ -72,7 +73,20 @@ public class GestionJugadores {
 				// TODO: Arreglar el daño
 				//System.out.println(ataqueRecibido.daño);
 			}
+			
+
+			// Si soy cliente recibo mis datos del servidor, ( monedas , tipo espada ). Las colisiones con el loot se realizan en el servidor por tanto es necesario sincronizar
+			Espada nuevaEspada = mapa.getJuego().getConexionSocket().recogerEspada();
+			// Si tengo nueva espada la asigno
+			if ( nuevaEspada != null )
+				getJugadorPrincipal().setEspada(nuevaEspada);
+			
+			// Nueva moneda
+			int nuevaMoneda = mapa.getJuego().getConexionSocket().recogerMoneda();
+			if ( nuevaMoneda == 1 )
+				getJugadorPrincipal().addMoneda();
 		}
+		
 		
 		// Sincronizo los datos del jugador remoto
 		sincronizarJugadorRemoto();
@@ -113,6 +127,8 @@ public class GestionJugadores {
 		misDatos.setEstado( getJugadorPrincipal().getEstado() );
 		// Tiempo estado
 		misDatos.setTiempoEstado( getJugadorPrincipal().getTiempoEstado());
+		// Espada
+		misDatos.setEspada( getJugadorPrincipal().getEspada() );
 		
 		// Agrega los datos del jugador al objeto que enviará al remoto
 		mapa.getDatosEnviar().setDatosJugador(misDatos);
@@ -122,6 +138,8 @@ public class GestionJugadores {
 			// Recoge el objeto recibido
 			DatosJugador datosJugadorRemoto = mapa.getJuego().getConexionSocket().recogerDatos().getDatosJugador();
 			
+			// Espada
+			getJugadorRemoto().setEspada(datosJugadorRemoto.getEspada());
 			// Posición del sprite
 			getJugadorRemoto().setPosition(
 					getJugadorRemoto().getCuerpo().getPosition().x - getJugadorRemoto().getWidth() / 2,

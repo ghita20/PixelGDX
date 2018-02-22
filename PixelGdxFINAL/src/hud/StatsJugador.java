@@ -133,18 +133,6 @@ public class StatsJugador {
 		// Crea los dialogos
 		crearDialogos();
 		
-		// Botón de salir
-//		final TextButton btnSalir = new TextButton("Salir", skin, "default");
-//		btnSalir.setBounds(1090, 560, 100, 40);
-//		// Listener
-//		btnSalir.addListener( new ClickListener() {
-//			@Override
-//			public void clicked(InputEvent event, float x, float y) {
-//				System.exit(0);
-//			}
-//		});
-//		// Añade el botón
-//		stage.addActor(btnSalir);
 	}
 	
 	// Crea los dialogos
@@ -225,6 +213,17 @@ public class StatsJugador {
 		// Puntos del vida del jugador
 		int numVidas = jugador.getPuntosDeVida();
 		int vidasCorazones = 0;
+		
+		// Esto por si revivimos a full vida
+		if ( numVidas == Jugador.MAX_VIDA ) {
+			for ( int i = 0 ; i < numVidas/4 ; i++ ) {
+				// Full vida todos los corazones
+				corazones.get(i).setVida(Corazon.MAX_PUNTOS);
+				// Refresca imagen
+				vidas.get( i ).setActor( corazones.get(i).getCorazon());
+			}
+			return;
+		}
 		
 		// Calcula cuantos puntos de vida tenemos almacenados en los corazones
 		for ( int i = corazones.size()-1; i>=0 ; i-- ) 

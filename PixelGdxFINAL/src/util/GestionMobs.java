@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 import juego.PixelGdx;
 import pantallas.MapaUno;
+import sockets.DatoLoot;
 import sockets.DatosJugador;
 import sockets.DatosMob;
 import sockets.DatosMobs;
@@ -69,14 +70,8 @@ public class GestionMobs {
 			else { // Si está muerto lo añade a li lista de cuerpos a eliminar
 				mapa.getWorldUpdate().addCuerpo(enemigo.getCuerpo());
 
-				// Genera el loot aleatoriamente
-				int random = (int) (Math.random()*10);
-				System.out.println(random);
-				if ( random > 5) {
-					Loot auxLoot = new Moneda(mapa,enemigo.getCuerpo().getPosition().x,enemigo.getCuerpo().getPosition().y,BodyType.StaticBody,true);
-					// Lo añade al mundo
-					mapa.getLoot().addLoot(auxLoot); 
-				}
+				// genera loot aleatorio...
+				generarLootAleatorio(enemigo.getCuerpo().getPosition().x,enemigo.getCuerpo().getPosition().y);
 
 				// y lo elimina del arraylist
 				iterador.remove();
@@ -163,5 +158,25 @@ public class GestionMobs {
 		enemigos.addAll(murcielagos);
 	}
 	
+	// Genera loot aleatorio
+	private void generarLootAleatorio ( float x , float y) {
+		// Genera el loot aleatoriamente
+		int random = (int) (Math.random()*10);
+		System.out.println(random);
+		if ( random > 5) {
+			Loot auxLoot = new Moneda(mapa,x,y,BodyType.StaticBody,true);
+			// Lo añade al mundo
+			mapa.getLoot().addLoot(auxLoot); 
+			
+			// Mando el nuevo loot al cliente
+			DatoLoot nuevoLoot = new DatoLoot();
+			nuevoLoot.setId(auxLoot.getId());
+			nuevoLoot.setPosicion(auxLoot.getCuerpo().getPosition());
+			nuevoLoot.setTiempoAnimacion(auxLoot.getTiempo());
+			nuevoLoot.setTipo(auxLoot.getClass().getSimpleName());
+			// Envia el objeto
+			mapa.getJuego().getConexionSocket().enviarDatos(nuevoLoot);
+		}
+	}
 
 }

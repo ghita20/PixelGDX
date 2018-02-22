@@ -40,6 +40,9 @@ public class GestionesMapaUno {
 		// Crea los objetos fisicos del mapa
 		BodyCreator.crearCuerposMapa(mapa.getWorld(), map);
 		
+		// Crea el vacío. ( lugar donde si cae el personaje reaparece )
+		BodyCreator.crearVacio(mapa.getWorld(), map);
+		
 	}
 	
 	// 

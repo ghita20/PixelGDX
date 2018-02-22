@@ -1,6 +1,5 @@
 package pantallas;
 
-import java.awt.Dialog;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -10,9 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -20,6 +22,9 @@ import juego.PixelGdx;
 import util.GestionAudio;
 
 public class Inicio implements Screen{
+	
+	// Juego
+	private PixelGdx game;
 	// Skin
 	private Stage stage;
 	private Skin skin;
@@ -29,6 +34,9 @@ public class Inicio implements Screen{
 	
 	// Constructor
 	public Inicio( PixelGdx game ) {
+		// Gem
+		this.game = game;
+		
 		// Skin - Comic
 		stage = new Stage();
 		skin = new Skin(Gdx.files.internal("assets/skins/clean-crispy/skin/clean-crispy-ui.json"));
@@ -58,13 +66,14 @@ public class Inicio implements Screen{
 		btnIniciar.addListener( new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
+				
 				// Reproduce el sonido de la moneda
 				GestionAudio.SONIDO_MONEDA.play();
 				// Instancia el socket
 				game.setConexionSocket(modoServidor);
-				// Pone la pantalla principal
-				game.setScreen( new MapaUno(game) );
-				Gdx.input.setInputProcessor(null);
+				
+				// Pone la pantalla de juego
+				ponerPantallaJuego();
 			}
 		});
 		// Añade el botón a la pantalla
@@ -119,9 +128,16 @@ public class Inicio implements Screen{
 		stage.addActor(buttonDebug);
 	}
 
+	protected void ponerPantallaJuego() {
+		// Pone la pantalla principal
+		game.setScreen( new MapaUno(game) );
+		Gdx.input.setInputProcessor(null);
+	}
+
 	private void update(float arg0) {
 		// TODO Auto-generated method stub
 		stage.act(arg0);
+		
 	}
 
 	@Override

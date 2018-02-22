@@ -46,8 +46,7 @@ public class PixelGdx extends Game {
 		// Musica de fondo
 		GestionAudio.MUSICA_FONDO.play();
 		
-		// Carga el Mapa1
-		//setScreen( new MapaUno(this) );
+		// Carga la pantalla de inicio
 		setScreen( new Inicio(this));
 	}
 	

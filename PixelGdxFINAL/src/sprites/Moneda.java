@@ -18,6 +18,10 @@ public class Moneda extends Loot {
 	public Moneda(MapaUno mapa, float x, float y, BodyType tipo, boolean sensor) {
 		super(mapa, x, y, SPRITE_WIDTH, SPRITE_HEIGHT, tipo, sensor);
 	}
+	// Este constructor lo utilizo cuando tengo que crear una moneda proveniente del servidor en el cliente 
+	public Moneda(MapaUno mapa, float x, float y, BodyType tipo, boolean sensor, int id) {
+		super(mapa, x, y, SPRITE_WIDTH, SPRITE_HEIGHT, tipo, sensor,id);
+	}
 
 	@Override
 	protected void cargarAnimacion() {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="197" height="200" tilewidth="16" tileheight="16" backgroundcolor="#000000" nextobjectid="365">
+<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="197" height="200" tilewidth="16" tileheight="16" backgroundcolor="#000000" nextobjectid="367">
  <tileset firstgid="1" source="tsx/tileset.tsx"/>
  <tileset firstgid="1161" source="tsx/sky.tsx"/>
  <tileset firstgid="1294" source="tsx/farground.tsx"/>
@@ -447,5 +447,9 @@
   <object id="210" x="1944" y="2629" width="99" height="59"/>
   <object id="211" x="2160" y="2549" width="59" height="26"/>
   <object id="212" x="2050" y="2453" width="53" height="25"/>
+  <object id="366" x="-63.6364" y="1569.7" width="63.6364" height="1615.15"/>
+ </objectgroup>
+ <objectgroup name="muerte">
+  <object id="365" x="-751.515" y="3178.79" width="5133.33" height="63.6364"/>
  </objectgroup>
 </map>

@@ -48,7 +48,7 @@ public class GestionLoot {
 		if ( mapa.getJuego().getConexionSocket().recogerDatos() != null ) {
 			// Recoge el objeto recibido
 			DatosLoot datosLoot = mapa.getJuego().getConexionSocket().recogerDatos().getDatosLoot();
-
+			
 			// Itera sobre el loot
 			Iterator<Loot> iterador = loot.iterator();
 			// Recorre el loot
@@ -78,7 +78,18 @@ public class GestionLoot {
 					iterador.remove();
 				}
 			}
-			// TODO: Crear loot nuevo del servidor en el cliente
+		}
+		
+		// Crea el loot nuevo del servidor en el cliente ya que todo se crea primero en el servidor
+		DatoLoot nuevoLoot = mapa.getJuego().getConexionSocket().recogerLoot();
+		if ( nuevoLoot != null ) {
+			// Si es de tipo moneda
+			if ( nuevoLoot.getTipo().equals("Moneda")) {
+				// Instancia la moneda
+				Moneda auxM = new Moneda(mapa, nuevoLoot.getPosicion().x, nuevoLoot.getPosicion().y, BodyType.StaticBody, true);
+				// Añade la moneda al gestionloot
+				mapa.getLoot().addLoot(auxM);
+			}
 		}
 	}
 

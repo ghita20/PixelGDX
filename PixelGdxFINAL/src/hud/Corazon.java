@@ -31,6 +31,9 @@ public class Corazon {
 	public int getVida ( ) {
 		return vida;
 	}
+	public void setVida ( int vida ) {
+		this.vida = vida;
+	}
 
 	// Resta un punto de vida
 	public void restarPunto ( ) {
