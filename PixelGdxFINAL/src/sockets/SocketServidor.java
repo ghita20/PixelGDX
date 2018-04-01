@@ -9,7 +9,7 @@ import java.net.UnknownHostException;
 public class SocketServidor extends PixelSocket{
 	
 	// IP y Puerto por defecto
-	public static final String IP 	= "192.168.0.154";
+	public static final String IP 	= "localhost";
 	public static final int PUERTO 	= 61000;
 	
 	// Socket servidor
